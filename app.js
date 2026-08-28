@@ -87,13 +87,19 @@ function startApp() {
   if (started) return;
   started = true;
 
-  ensureSession().then(() => {
-    onSnapshot(sessionRef, (snap) => {
-      if (!snap.exists()) return;
-      latestData = snap.data();
-      render(latestData);
-    });
-  });
+  ensureSession()
+    .then(() => {
+      onSnapshot(
+        sessionRef,
+        (snap) => {
+          if (!snap.exists()) return;
+          latestData = snap.data();
+          render(latestData);
+        },
+        (err) => showConnectionError(err)
+      );
+    })
+    .catch((err) => showConnectionError(err));
 
   els.answers.addEventListener("click", (e) => {
     const btn = e.target.closest(".answer-btn");
@@ -108,6 +114,12 @@ function startApp() {
 
 function updatePlayerIndicator() {
   els.currentPlayerName.textContent = NAMES[myPlayer];
+}
+
+function showConnectionError(err) {
+  console.error("Firestore error:", err);
+  els.questionText.textContent = "Couldn't connect — check the Firestore database is set up.";
+  els.questionCount.textContent = "Connection problem";
 }
 
 function shuffledDeck() {
