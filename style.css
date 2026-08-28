@@ -1,0 +1,252 @@
+:root {
+  --pink: #ff6f91;
+  --purple: #9b5de5;
+  --deep: #4a1c6b;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --text: #35213f;
+  --muted: #8b7a97;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  background-attachment: fixed;
+  color: var(--text);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.bg-hearts {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.15) 0, transparent 6%),
+    radial-gradient(circle at 80% 15%, rgba(255,255,255,0.12) 0, transparent 5%),
+    radial-gradient(circle at 30% 80%, rgba(255,255,255,0.15) 0, transparent 6%),
+    radial-gradient(circle at 90% 70%, rgba(255,255,255,0.1) 0, transparent 5%),
+    radial-gradient(circle at 60% 40%, rgba(255,255,255,0.1) 0, transparent 4%);
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background: var(--card-bg);
+  border-radius: 24px;
+  padding: 32px 28px;
+  box-shadow: 0 20px 60px rgba(74, 28, 107, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin: 0 0 6px;
+  font-size: 1.6rem;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.progress-wrap {
+  height: 6px;
+  background: #f0e6f6;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  transition: width 0.3s ease;
+}
+
+.question-box {
+  text-align: center;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.question-count {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.question {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.35;
+}
+
+.question::first-letter {
+  text-transform: uppercase;
+}
+
+.answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.answer-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  border: 2px solid #eee0f4;
+  border-radius: 16px;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.answer-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--pink);
+}
+
+.answer-btn:active {
+  transform: translateY(0);
+}
+
+.answer-btn.selected {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  border-color: transparent;
+  color: #fff;
+}
+
+.answer-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.answer-emoji {
+  font-size: 1.6rem;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.ghost-btn,
+.primary-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.ghost-btn {
+  background: transparent;
+  border: 2px solid #eee0f4;
+  color: var(--muted);
+}
+
+.ghost-btn:hover {
+  border-color: var(--purple);
+  color: var(--purple);
+}
+
+.primary-btn {
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  color: #fff;
+}
+
+.primary-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.scoreboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  border-top: 1px solid #f0e6f6;
+  padding-top: 18px;
+}
+
+.score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.score-label {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.score-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.reset-link {
+  display: block;
+  margin: 16px auto 0;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.reset-link:hover {
+  color: var(--pink);
+}
+
+@media (max-width: 400px) {
+  .question {
+    font-size: 1.2rem;
+  }
+}
