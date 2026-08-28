@@ -11,10 +11,31 @@
 
   <div class="bg-hearts" aria-hidden="true"></div>
 
+  <div class="player-picker hidden" id="playerPicker">
+    <div class="player-picker-card">
+      <h2>Who's playing?</h2>
+      <p class="subtitle">Pick your name on this phone — it'll remember.</p>
+      <div class="player-picker-buttons">
+        <button class="player-btn" id="pickA">
+          <span class="answer-emoji">🧑</span>
+          <span class="player-btn-name">Jonas</span>
+        </button>
+        <button class="player-btn" id="pickB">
+          <span class="answer-emoji">👩</span>
+          <span class="player-btn-name">Ella</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <main class="card">
     <header>
       <h1>Who's More Likely To…</h1>
-      <p class="subtitle">Point at each other. Loser buys ice cream. 🍦</p>
+      <p class="subtitle">Answer from anywhere, see it live. 🍦</p>
+      <p class="player-indicator" id="playerIndicator">
+        Playing as <strong id="currentPlayerName">…</strong> ·
+        <button class="link-btn" id="switchPlayerBtn">switch</button>
+      </p>
     </header>
 
     <div class="progress-wrap">
@@ -45,6 +66,17 @@
       </button>
     </section>
 
+    <p class="waiting-msg hidden" id="waitingMsg">
+      <span class="pulse-dot"></span>
+      <span id="waitingText">Waiting…</span>
+    </p>
+
+    <div class="reveal-box hidden" id="revealBox">
+      <p class="reveal-row" id="revealA"></p>
+      <p class="reveal-row" id="revealB"></p>
+      <p class="match-banner" id="matchBanner"></p>
+    </div>
+
     <div class="controls">
       <button class="ghost-btn" id="skipBtn">Skip ⏭</button>
       <button class="primary-btn" id="nextBtn" disabled>Next ➜</button>
@@ -69,10 +101,11 @@
       </div>
     </section>
 
+    <p class="match-stat" id="matchStat">0 / 0 matched</p>
+
     <button class="reset-link" id="resetBtn">Reset scores</button>
   </main>
 
-  <script src="questions.js"></script>
-  <script src="script.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

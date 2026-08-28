@@ -13,7 +13,7 @@
 
 // Change these two names if you ever want the site to use
 // different names instead of Jonas / Ella.
-const NAMES = {
+export const NAMES = {
   a: "Jonas",
   b: "Ella",
 };
@@ -126,4 +126,4 @@ const QUESTION_GROUPS = {
 };
 
 // Flatten everything above into one big list — don't touch this part.
-const QUESTIONS = Object.values(QUESTION_GROUPS).flat();
+export const QUESTIONS = Object.values(QUESTION_GROUPS).flat();
