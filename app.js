@@ -1,4 +1,4 @@
-import { QUESTIONS, NAMES } from "./questions.js";
+import { GAME_MODES, NAMES } from "./questions.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import {
@@ -9,6 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const PLAYER_KEY = "whosMoreLikely.player";
+const DEFAULT_MODE = "likely";
 const EMPTY_SCORES = { a: 0, b: 0, both: 0, neither: 0, matches: 0, rounds: 0 };
 
 const app = initializeApp(firebaseConfig);
@@ -23,15 +24,21 @@ const els = {
   currentPlayerName: document.getElementById("currentPlayerName"),
   switchPlayerBtn: document.getElementById("switchPlayerBtn"),
 
+  modeTabs: document.getElementById("modeTabs"),
+
   questionText: document.getElementById("questionText"),
   questionCount: document.getElementById("questionCount"),
   progressBar: document.getElementById("progressBar"),
   answers: document.getElementById("answers"),
+  textAnswerBox: document.getElementById("textAnswerBox"),
+  textInput: document.getElementById("textInput"),
+  submitTextBtn: document.getElementById("submitTextBtn"),
   skipBtn: document.getElementById("skipBtn"),
   nextBtn: document.getElementById("nextBtn"),
   resetBtn: document.getElementById("resetBtn"),
   nameA: document.getElementById("nameA"),
   nameB: document.getElementById("nameB"),
+  scoreboard: document.getElementById("scoreboard"),
   scoreLabelA: document.getElementById("scoreLabelA"),
   scoreLabelB: document.getElementById("scoreLabelB"),
   scoreA: document.getElementById("scoreA"),
@@ -101,15 +108,36 @@ function startApp() {
     })
     .catch((err) => showConnectionError(err));
 
+  els.modeTabs.addEventListener("click", (e) => {
+    const btn = e.target.closest(".mode-tab");
+    if (!btn) return;
+    switchMode(btn.dataset.mode);
+  });
+
   els.answers.addEventListener("click", (e) => {
     const btn = e.target.closest(".answer-btn");
     if (!btn || btn.disabled) return;
     submitAnswer(btn.dataset.answer);
   });
 
+  els.submitTextBtn.addEventListener("click", submitTextAnswer);
+  els.textInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      submitTextAnswer();
+    }
+  });
+
   els.nextBtn.addEventListener("click", advance);
   els.skipBtn.addEventListener("click", advance);
   els.resetBtn.addEventListener("click", resetScores);
+}
+
+function submitTextAnswer() {
+  const text = els.textInput.value.trim();
+  if (!text) return;
+  submitAnswer(text);
+  els.textInput.value = "";
 }
 
 function updatePlayerIndicator() {
@@ -130,8 +158,8 @@ function withTimeout(promise, ms, message) {
   ]);
 }
 
-function shuffledDeck() {
-  const deck = QUESTIONS.map((_, i) => i);
+function shuffledDeck(count) {
+  const deck = Array.from({ length: count }, (_, i) => i);
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -144,13 +172,30 @@ async function ensureSession() {
     const snap = await tx.get(sessionRef);
     if (!snap.exists()) {
       tx.set(sessionRef, {
-        deck: shuffledDeck(),
+        mode: DEFAULT_MODE,
+        deck: shuffledDeck(GAME_MODES[DEFAULT_MODE].questions.length),
         deckIndex: 0,
         answers: { a: null, b: null },
         resolved: false,
         scores: EMPTY_SCORES,
       });
     }
+  });
+}
+
+async function switchMode(mode) {
+  if (!GAME_MODES[mode]) return;
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(sessionRef);
+    const data = snap.data();
+    if (data && data.mode === mode) return;
+    tx.update(sessionRef, {
+      mode,
+      deck: shuffledDeck(GAME_MODES[mode].questions.length),
+      deckIndex: 0,
+      answers: { a: null, b: null },
+      resolved: false,
+    });
   });
 }
 
@@ -165,13 +210,16 @@ async function submitAnswer(key) {
     const update = { answers };
 
     if (bothAnswered) {
-      const scores = { ...EMPTY_SCORES, ...data.scores };
-      scores[answers.a] = (scores[answers.a] || 0) + 1;
-      scores[answers.b] = (scores[answers.b] || 0) + 1;
-      scores.rounds += 1;
-      if (answers.a === answers.b) scores.matches += 1;
       update.resolved = true;
-      update.scores = scores;
+      const mode = data.mode || DEFAULT_MODE;
+      if (GAME_MODES[mode].type === "likely") {
+        const scores = { ...EMPTY_SCORES, ...data.scores };
+        scores[answers.a] = (scores[answers.a] || 0) + 1;
+        scores[answers.b] = (scores[answers.b] || 0) + 1;
+        scores.rounds += 1;
+        if (answers.a === answers.b) scores.matches += 1;
+        update.scores = scores;
+      }
     }
 
     tx.update(sessionRef, update);
@@ -184,10 +232,12 @@ async function advance() {
     const data = snap.data();
     if (!data) return;
 
+    const mode = data.mode || DEFAULT_MODE;
+    const total = GAME_MODES[mode].questions.length;
     let deck = data.deck;
     let deckIndex = data.deckIndex + 1;
     if (deckIndex >= deck.length) {
-      deck = shuffledDeck();
+      deck = shuffledDeck(total);
       deckIndex = 0;
     }
 
@@ -210,33 +260,58 @@ async function resetScores() {
 }
 
 function render(data) {
-  const q = QUESTIONS[data.deck[data.deckIndex]] || "…";
-  els.questionText.textContent = q + "?";
+  const mode = data.mode || DEFAULT_MODE;
+  const modeConfig = GAME_MODES[mode];
+  const isLikely = modeConfig.type === "likely";
+
+  els.modeTabs.querySelectorAll(".mode-tab").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+
+  const rawQ = modeConfig.questions[data.deck[data.deckIndex]] || "…";
+  els.questionText.textContent = isLikely ? rawQ + "?" : rawQ;
   els.questionCount.textContent = `Question ${data.deckIndex + 1}`;
   els.progressBar.style.width = ((data.deckIndex + 1) / data.deck.length) * 100 + "%";
+
+  els.answers.classList.toggle("hidden", !isLikely);
+  els.textAnswerBox.classList.toggle("hidden", isLikely);
+  els.scoreboard.classList.toggle("hidden", !isLikely);
+  els.matchStat.classList.toggle("hidden", !isLikely);
 
   const myAnswer = data.answers[myPlayer];
   const otherPlayer = myPlayer === "a" ? "b" : "a";
   const otherName = NAMES[otherPlayer];
   const iAnswered = myAnswer !== null;
 
-  els.answers.querySelectorAll(".answer-btn").forEach((b) => {
-    const key = b.dataset.answer;
-    b.disabled = iAnswered;
-    b.classList.toggle("selected", key === myAnswer);
-  });
+  if (isLikely) {
+    els.answers.querySelectorAll(".answer-btn").forEach((b) => {
+      const key = b.dataset.answer;
+      b.disabled = iAnswered;
+      b.classList.toggle("selected", key === myAnswer);
+    });
+  } else {
+    els.textInput.disabled = iAnswered;
+    els.submitTextBtn.disabled = iAnswered;
+  }
 
   els.nextBtn.disabled = !data.resolved;
 
   if (data.resolved) {
     els.waitingMsg.classList.add("hidden");
     els.revealBox.classList.remove("hidden");
-    els.revealA.textContent = `${EMOJI[data.answers.a]} ${NAMES.a} picked: ${answerLabel(data.answers.a)}`;
-    els.revealB.textContent = `${EMOJI[data.answers.b]} ${NAMES.b} picked: ${answerLabel(data.answers.b)}`;
-    const matched = data.answers.a === data.answers.b;
-    els.matchBanner.textContent = matched ? "🎉 You matched!" : "You picked differently";
-    els.matchBanner.classList.toggle("match", matched);
-    els.matchBanner.classList.toggle("no-match", !matched);
+    if (isLikely) {
+      els.revealA.textContent = `${EMOJI[data.answers.a]} ${NAMES.a} picked: ${answerLabel(data.answers.a)}`;
+      els.revealB.textContent = `${EMOJI[data.answers.b]} ${NAMES.b} picked: ${answerLabel(data.answers.b)}`;
+      const matched = data.answers.a === data.answers.b;
+      els.matchBanner.textContent = matched ? "🎉 You matched!" : "You picked differently";
+      els.matchBanner.classList.toggle("match", matched);
+      els.matchBanner.classList.toggle("no-match", !matched);
+      els.matchBanner.classList.remove("hidden");
+    } else {
+      els.revealA.textContent = `${NAMES.a}: ${data.answers.a}`;
+      els.revealB.textContent = `${NAMES.b}: ${data.answers.b}`;
+      els.matchBanner.classList.add("hidden");
+    }
   } else {
     els.revealBox.classList.add("hidden");
     if (iAnswered) {

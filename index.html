@@ -38,6 +38,12 @@
       </p>
     </header>
 
+    <div class="mode-tabs" id="modeTabs">
+      <button class="mode-tab" data-mode="likely">🤔 Likely</button>
+      <button class="mode-tab" data-mode="fillblank">✏️ Fill in the Blank</button>
+      <button class="mode-tab" data-mode="openended">💬 Open Ended</button>
+    </div>
+
     <div class="progress-wrap">
       <div class="progress-bar" id="progressBar"></div>
     </div>
@@ -66,6 +72,11 @@
       </button>
     </section>
 
+    <div class="text-answer-box hidden" id="textAnswerBox">
+      <textarea id="textInput" class="text-input" placeholder="Type your answer…" rows="2"></textarea>
+      <button class="primary-btn" id="submitTextBtn">Submit</button>
+    </div>
+
     <p class="waiting-msg hidden" id="waitingMsg">
       <span class="pulse-dot"></span>
       <span id="waitingText">Waiting…</span>
@@ -82,7 +93,7 @@
       <button class="primary-btn" id="nextBtn" disabled>Next ➜</button>
     </div>
 
-    <section class="scoreboard" aria-label="Scoreboard">
+    <section class="scoreboard" id="scoreboard" aria-label="Scoreboard">
       <div class="score" data-score="a">
         <span class="score-label" id="scoreLabelA">Jonas</span>
         <span class="score-value" id="scoreA">0</span>

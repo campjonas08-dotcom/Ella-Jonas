@@ -1,22 +1,28 @@
 # Who's More Likely? 💕
 
-A "Who's More Likely To…" quiz webpage for two players. Each of you opens it on
-your own phone, picks your name once, and you both answer the same question —
-answers, the match/no-match reveal, and the scoreboard sync live between your
-phones via Firebase.
+A little game night webpage for two players, with three modes: **Who's More
+Likely** (pick Jonas/Ella/Both/Neither), **Fill in the Blank**, and **Open
+Ended** (free-text conversation prompts). Each of you opens it on your own
+phone, picks your name once, and you both answer the same question — the
+current question, your answers, the reveal, and the scoreboard all sync live
+between your phones via Firebase. Switch modes any time with the tabs at the
+top — it's shared, so switching on one phone switches it for both of you.
 
 ## Editing the questions
 
-Open **`questions.js`**. Questions are grouped into labeled lists just to keep
-things tidy — the groups don't show up on the site, they're just for you.
+Open **`questions.js`**. There are three lists to edit, one per mode:
+`QUESTION_GROUPS` (for Who's More Likely, grouped into labeled lists just to
+keep things tidy — the group names don't show up on the site), plus
+`FILL_BLANK_QUESTIONS` and `OPEN_ENDED_QUESTIONS` (flat lists).
 
-- **Add a question:** add a new line inside any group, in quotes, ending with a comma:
+- **Add a question:** add a new line in the right list, in quotes, ending with a comma:
   ```js
   "forget where they parked the car",
   ```
 - **Remove a question:** delete its line.
 - **Edit a question:** change the text between the quotes.
-- **Add a whole new category:** copy an existing group and give it a new key, e.g.:
+- **Add a whole new "Likely" category:** copy an existing group in
+  `QUESTION_GROUPS` and give it a new key, e.g.:
   ```js
   holidays: [
     "forget to buy a gift",
@@ -24,8 +30,15 @@ things tidy — the groups don't show up on the site, they're just for you.
   ],
   ```
 
-Questions are written **without** a question mark and lowercase (e.g. `"forget
-their keys"`) — the site automatically capitalizes and adds the `?` for you.
+**Who's More Likely** questions are written **without** a question mark and
+lowercase (e.g. `"forget their keys"`) — the site automatically capitalizes
+and adds the `?` for you.
+
+**Fill in the Blank** questions use `___` for the blank, e.g. `"My favorite
+thing about you is ___"`.
+
+**Open Ended** questions are written as full prompts/questions, shown exactly
+as typed — no auto-formatting.
 
 To rename the two players, edit the top of `questions.js`:
 ```js

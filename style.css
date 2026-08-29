@@ -382,3 +382,56 @@ h1 {
   font-size: 0.75rem;
   color: var(--muted);
 }
+
+.mode-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  overflow-x: auto;
+}
+
+.mode-tab {
+  flex: 1;
+  white-space: nowrap;
+  padding: 8px 10px;
+  border: 2px solid #eee0f4;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.mode-tab.active {
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  border-color: transparent;
+  color: #fff;
+}
+
+.text-answer-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #eee0f4;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  color: var(--text);
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--pink);
+}
+
+.text-input:disabled {
+  opacity: 0.6;
+}
