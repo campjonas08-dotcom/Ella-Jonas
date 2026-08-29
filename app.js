@@ -87,7 +87,7 @@ function startApp() {
   if (started) return;
   started = true;
 
-  ensureSession()
+  withTimeout(ensureSession(), 10000, "timed out reaching Firestore")
     .then(() => {
       onSnapshot(
         sessionRef,
@@ -118,8 +118,16 @@ function updatePlayerIndicator() {
 
 function showConnectionError(err) {
   console.error("Firestore error:", err);
-  els.questionText.textContent = "Couldn't connect — check the Firestore database is set up.";
+  const detail = err && err.message ? ` (${err.message})` : "";
+  els.questionText.textContent = `Couldn't connect${detail} — try a different network/browser, or check Firestore is set up.`;
   els.questionCount.textContent = "Connection problem";
+}
+
+function withTimeout(promise, ms, message) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms)),
+  ]);
 }
 
 function shuffledDeck() {
