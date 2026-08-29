@@ -59,6 +59,7 @@ els.pickB.querySelector(".player-btn-name").textContent = NAMES.b;
 
 let myPlayer = localStorage.getItem(PLAYER_KEY);
 let latestData = null;
+let started = false;
 
 if (myPlayer === "a" || myPlayer === "b") {
   startApp();
@@ -81,7 +82,6 @@ function showPlayerPicker() {
   els.playerPicker.classList.remove("hidden");
 }
 
-let started = false;
 function startApp() {
   updatePlayerIndicator();
   if (started) return;
